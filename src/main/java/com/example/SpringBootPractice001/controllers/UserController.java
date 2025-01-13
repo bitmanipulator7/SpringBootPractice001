@@ -29,9 +29,17 @@ public class UserController {
 
     // Get User by ID
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
+    public ResponseEntity<Object> getUser(@PathVariable Long id) {
         Optional<User> user = userService.getUserById(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        if (user.isPresent()) {
+            // return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+            // Return the user as a ResponseEntity
+            return ResponseEntity.ok(user.get());
+        } else {
+            // If the user is not found, return a custom message with 404 status
+            String errorMessage = "No user found for the id " + id;
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage);
+        }
     }
 
     // Get all Users
@@ -42,8 +50,14 @@ public class UserController {
 
     // Delete User by ID
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUserById(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        int affectedRows = userService.deleteUserById(id);
+
+        if (affectedRows == 0) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("User with id " + id + " could not be deleted. Check if it exists.");
+        }
+        //return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("User with id " + id + " was successfully deleted.");
     }
 }

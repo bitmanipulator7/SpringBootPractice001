@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // https://www.baeldung.com/intellij-resolve-spring-boot-configuration-properties
-    private long id;
+    private Long id;
     private String name;
     private String email;
 
